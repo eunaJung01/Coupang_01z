@@ -1,6 +1,7 @@
 package com.umc.coupang_01z.src.Restaurant;
 
-import com.umc.coupang_01z.src.Restaurant.model.GetRestRes;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.umc.coupang_01z.src.Restaurant.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.umc.coupang_01z.config.*;
@@ -34,21 +35,46 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/category")
-    public BaseResponse<List<GetRestRes>> getCategory() throws BaseException {
+    public BaseResponse<List<GetCategoryRes>> getCategory() throws BaseException {
         try {
-            // TODO: 형식적 validation
+            List<GetCategoryRes> getCategoryRes = restaurantProvider.getCategory();
+            return new BaseResponse<>(getCategoryRes);
 
-            // Service(GET) or Provider 호출
-            // Service - Select(R)
-            // Provider - Insert, Update, Delete(CUD)
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
-            List<GetRestRes> getRestRes = restaurantProvider.getCategory();
+    /*
+     * 카테고리별 음식점 조회
+     * 1. default : [GET] /restaurant
+     * 1. 별점 높은 순 : [GET] /restaurant?rate
+     * 2. 치타 배달 : [GET] /restaurant?isCheetah
+     * 3. 배달비 : [GET] /restaurant?deliveryFee
+     * 4. 최소 주문 : [GET] /restaurant?minOrderFee
+     */
+    @ResponseBody
+    @GetMapping("/restaurant")
+    public BaseResponse<List<GetRestRes>> getRestaurantsInCategory(@RequestParam(required = false) Bool rate, @RequestParam(required = false) Bool isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+        try {
+            List<GetRestRes> getRestRes;
+//            if (rate != null) { // 별점 높은 순
+////                getRestRes = restaurantProvider.getRestByRate();
+//            } else if (isCheetah != null) { // 치타 배달
+////                getRestRes = restaurantProvider.getRestByCheetah();
+//            } else if (deliveryFee != null) { // 배달비
+////                getRestRes = restaurantProvider.getRestByDeliveryFee();
+//            } else if (minOrderFee != null) { // 최소 주문
+////                getRestRes = restaurantProvider.getRestByMinOrderFee();
+//            } else { // default
+                getRestRes = restaurantProvider.getRest();
+//            }
+
             return new BaseResponse<>(getRestRes);
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
-
     }
 
 }

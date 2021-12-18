@@ -1,6 +1,6 @@
 package com.umc.coupang_01z.src.Restaurant;
 
-import com.umc.coupang_01z.src.Restaurant.model.GetRestRes;
+import com.umc.coupang_01z.src.Restaurant.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -18,14 +18,36 @@ public class RestaurantDao {
     }
 
     // 카테고리 조회
-    public List<GetRestRes> getCategory() {
+    public List<GetCategoryRes> getCategory() {
         String query = "SELECT * FROM Category WHERE status = 'A'";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetCategoryRes(
                         rs.getInt("categoryIdx"),
                         rs.getString("categoryName"),
                         rs.getString("categoryImg"))
         );
     }
 
+    public List<GetRestRes> getRest() {
+        String query = "SELECT * FROM Restaurant";
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetRestRes(
+                        rs.getInt("restIdx"),
+                        rs.getString("restName"),
+                        rs.getString("restImg"),
+                        rs.getInt("categoryIdx"),
+                        rs.getInt("isCheetah"),
+                        rs.getDouble("rate"),
+                        rs.getInt("deliveryFee"),
+                        rs.getInt("minOrderFee"),
+                        rs.getString("restAddress"),
+                        rs.getDouble("restLatitude"),
+                        rs.getDouble("restLongitude")
+                )
+        );
+    }
+
+//    public List<GetRestRes> getRestByRate() {
+//
+//    }
 }

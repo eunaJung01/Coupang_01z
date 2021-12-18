@@ -8,7 +8,15 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetRestRes {
+    private int restIdx;
+    private String restName;
+    private String restImg;
     private int categoryIdx;
-    private String categoryName;
-    private String categoryImg;
+    private int isCheetah;
+    private double rate;
+    private int deliveryFee;
+    private int minOrderFee;
+    private String restAddress;
+    private double restLatitude;
+    private double restLongitude;
 }
