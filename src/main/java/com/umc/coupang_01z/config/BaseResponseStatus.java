@@ -57,10 +57,10 @@ public enum BaseResponseStatus {
 
     // 5000 : 필요시 만들어서 쓰세요 - 서리
     // User table - 5000번대
-    POST_USERS_NOT_REGSTERED_EMAIL(false, 5001, "가입되지 않은 이메일입니다.");
+    POST_USERS_NOT_REGSTERED_EMAIL(false, 5001, "가입되지 않은 이메일입니다."),
 
     // 6000 : 필요시 만들어서 쓰세요 - 레마
-
+    NO_RESULT(false, 6000, "검색 결과 없음");
 
     private final boolean isSuccess;
     private final int code;
