@@ -1,4 +1,4 @@
-package com.umc.coupang_01z.src.user;
+package com.umc.coupang_01z.src.address;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 
 @Repository
-public class UserDao {
+public class AddressDao {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired

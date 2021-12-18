@@ -11,7 +11,7 @@ public class UserService {
     private final JwtService jwtService;
 
 
-    @Autowired //readme 참고
+    @Autowired
     public UserService(UserDao userDao, UserProvider userProvider, JwtService jwtService) {
         this.userDao = userDao;
         this.userProvider = userProvider;
