@@ -42,7 +42,6 @@ public class UserProvider {
             GetUserRes getUserRes = userDao.getUser(userIdx);
             return getUserRes;
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
