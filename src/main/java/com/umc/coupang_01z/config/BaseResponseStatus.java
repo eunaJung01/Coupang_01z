@@ -56,6 +56,7 @@ public enum BaseResponseStatus {
 
 
     // 5000 : 필요시 만들어서 쓰세요 - 서리
+
     // 6000 : 필요시 만들어서 쓰세요 - 레마
 
 

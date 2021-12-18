@@ -20,17 +20,17 @@ public class JwtService {
 
     /*
      * JWT 생성
-     * @param usrIdx
+     * @param userIdx
      * @return String
      */
-    public String createJwt(int usrIdx) {
+    public String createJwt(int userIdx) {
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type", "jwt")
-                .claim("usrIdx", usrIdx)
+                .claim("userIdx", userIdx)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis() + 1 * (1000 * 60 * 60 * 24 * 365)))
                 .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + 1 * (1000 * 60 * 60 * 24 * 365)))
                 .compact();
     }
 
@@ -44,11 +44,11 @@ public class JwtService {
     }
 
     /*
-     * JWT에서 usrIdx 추출
+     * JWT에서 userIdx 추출
      * @return int
      * @throws BaseException
      */
-    public int getUsrIdx() throws BaseException {
+    public int getUserIdx() throws BaseException {
         // 1. JWT 추출
         String accessToken = getJwt();
         if (accessToken == null || accessToken.length() == 0) {
@@ -65,8 +65,8 @@ public class JwtService {
             throw new BaseException(INVALID_JWT);
         }
 
-        // 3. usrIdx 추출
-        return claims.getBody().get("usrIdx", Integer.class);  // jwt에서 usrIdx 추출
+        // 3. userIdx 추출
+        return claims.getBody().get("userIdx", Integer.class);  // jwt에서 userIdx 추출
     }
 
 }

@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import com.umc.coupang_01z.config.BaseException;
 import com.umc.coupang_01z.config.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.umc.coupang_01z.config.BaseResponseStatus.*;
+import static com.umc.coupang_01z.utils.ValidationRegex.isRegexEmail;
 
 @RestController
 @RequestMapping("/coupang-eats/users")
@@ -26,5 +28,39 @@ public class UserController {
         this.userProvider = userProvider;
         this.userService = userService;
         this.jwtService = jwtService;
+    }
+
+    /**
+     * 1. 회원가입 API
+     * [POST] /coupang-eats/users/sign-up
+     */
+    @ResponseBody
+    @PostMapping("/sign-up")    // POST 방식의 요청을 매핑하기 위한 어노테이션
+    public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
+        // Validation : 이메일 빈값인지 확인
+        if (postUserReq.getEmail() == null) {
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+
+        // Validation : 이메일 정규표현 확인
+        if (!isRegexEmail(postUserReq.getEmail())) {
+            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        }
+
+        // Validation : 이미 가입된 이메일인지 확인
+        try {
+            if (userProvider.checkEmail(postUserReq.getEmail()) == 1) {
+                return new BaseResponse<>(POST_USERS_EXISTS_EMAIL);
+            }
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+        try {
+            PostUserRes postUserRes = userService.createUser(postUserReq);
+            return new BaseResponse<>(postUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
 }
