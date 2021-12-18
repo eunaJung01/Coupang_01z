@@ -10,7 +10,6 @@ public class UserService {
     private final UserProvider userProvider;
     private final JwtService jwtService;
 
-
     @Autowired
     public UserService(UserDao userDao, UserProvider userProvider, JwtService jwtService) {
         this.userDao = userDao;
