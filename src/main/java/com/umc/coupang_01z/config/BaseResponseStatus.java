@@ -52,10 +52,12 @@ public enum BaseResponseStatus {
     MODIFY_FAIL_USERNAME(false, 4014, "유저네임 수정 실패"),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
 
 
     // 5000 : 필요시 만들어서 쓰세요 - 서리
+    // User table - 5000번대
+    POST_USERS_NOT_REGSTERED_EMAIL(false, 5001, "가입되지 않은 이메일입니다.");
 
     // 6000 : 필요시 만들어서 쓰세요 - 레마
 

@@ -80,6 +80,33 @@ public class UserController {
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
+    }
 
+    /**
+     * 3. 로그인 API
+     * [GET] /coupang-eats/users/log-in
+     */
+    @ResponseBody
+    @PostMapping("/log-in")
+    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq) {
+        try {
+            // Validation : 받은 email 값이 빈값은 아닌지 확인.
+            if (postLoginReq.getEmail() == null) {
+                return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+            }
+            // Validation : 이메일 정규표현 확인.
+            if (!isRegexEmail(postLoginReq.getEmail())) {
+                return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+            }
+            // Validation : 가입된 이메일인지 확인.
+            if (userProvider.checkEmail(postLoginReq.getEmail()) == 0) {
+                return new BaseResponse<>(POST_USERS_NOT_REGSTERED_EMAIL);
+            }
+
+            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
 }
