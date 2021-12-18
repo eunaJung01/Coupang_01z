@@ -1,11 +1,14 @@
 package com.umc.coupang_01z.src.user;
 
 import com.umc.coupang_01z.config.BaseException;
+import com.umc.coupang_01z.config.BaseResponse;
+import com.umc.coupang_01z.src.user.model.GetUserRes;
 import com.umc.coupang_01z.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import static com.umc.coupang_01z.config.BaseResponseStatus.*;
 
@@ -27,6 +30,17 @@ public class UserProvider {
         try {
             return userDao.checkEmail(email);
         } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [GET] 회원 조회
+    public GetUserRes getUser(int userIdx) throws BaseException {
+        try {
+            GetUserRes getUserRes = userDao.getUser(userIdx);
+            return getUserRes;
+        } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }

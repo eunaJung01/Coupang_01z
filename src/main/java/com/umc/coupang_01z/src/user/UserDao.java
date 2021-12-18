@@ -1,5 +1,7 @@
 package com.umc.coupang_01z.src.user;
 
+import com.umc.coupang_01z.config.BaseException;
+import com.umc.coupang_01z.config.BaseResponse;
 import com.umc.coupang_01z.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,5 +36,15 @@ public class UserDao {
         String checkEmailQuery = "select exists(select email from User where email = ?)";
         String checkEmailParams = email;
         return this.jdbcTemplate.queryForObject(checkEmailQuery, int.class, checkEmailParams);
+    }
+
+    // [GET] 회원 조회
+    public GetUserRes getUser(int userIdx) {
+        String getUserQuery = "select name, phoneNum from User where userIdx = ?"; // 해당 userIdx를 만족하는 유저를 조회하는 쿼리문
+        return this.jdbcTemplate.queryForObject(getUserQuery,
+                (rs, rowNum) -> new GetUserRes(
+                        rs.getString("name"),
+                        rs.getString("phoneNum")
+                ), userIdx);
     }
 }

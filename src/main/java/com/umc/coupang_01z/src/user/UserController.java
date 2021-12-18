@@ -9,6 +9,8 @@ import com.umc.coupang_01z.config.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.umc.coupang_01z.config.BaseResponseStatus.*;
 import static com.umc.coupang_01z.utils.ValidationRegex.isRegexEmail;
 
@@ -62,5 +64,22 @@ public class UserController {
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
+    }
+
+    /**
+     * 2. 회원 조회 API
+     * [GET] /coupang-eats/users
+     */
+    // Path-variable
+    @ResponseBody
+    @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:id
+    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
+        try {
+            GetUserRes getUserRes = userProvider.getUser(userIdx);
+            return new BaseResponse<>(getUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
     }
 }
