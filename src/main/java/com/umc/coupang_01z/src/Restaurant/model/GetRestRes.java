@@ -11,5 +11,4 @@ public class GetRestRes {
     private int categoryIdx;
     private String categoryName;
     private String categoryImg;
-    private String status;
 }

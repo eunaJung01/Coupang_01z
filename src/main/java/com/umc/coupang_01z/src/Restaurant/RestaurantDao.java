@@ -19,13 +19,12 @@ public class RestaurantDao {
 
     // 카테고리 조회
     public List<GetRestRes> getCategory() {
-        String query = "SELECT * FROM Category";
+        String query = "SELECT * FROM Category WHERE status = 'A'";
         return this.jdbcTemplate.query(query,
                 (rs, rowNum) -> new GetRestRes(
                         rs.getInt("categoryIdx"),
                         rs.getString("categoryName"),
-                        rs.getString("categoryImg"),
-                        rs.getString("status"))
+                        rs.getString("categoryImg"))
         );
     }
 
