@@ -94,10 +94,17 @@ public class RestaurantController {
     }
 
     /*
-     * 음식점 조회 : [GET] /restaurant/:restaurant
+     * 음식점 조회 : [GET] /restaurant/:restIdx
      */
-//    @ResponseBody
-//    @GetMapping("/{restaurantIdx}")
-//    public BaseResponse<GetRestRes>
+    @ResponseBody
+    @GetMapping("/restaurant/{restIdx}")
+    public BaseResponse<GetRestRes> getRestaurant(@PathVariable("restIdx") int restIdx) {
+        try {
+            return new BaseResponse<>(restaurantProvider.getRestaurant(restIdx));
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }

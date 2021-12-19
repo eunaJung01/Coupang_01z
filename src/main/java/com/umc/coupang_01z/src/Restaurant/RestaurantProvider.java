@@ -168,4 +168,13 @@ public class RestaurantProvider {
         }
     }
 
+    // 음식점 조회
+    public GetRestRes getRestaurant(int restIdx) throws BaseException {
+        try {
+            return (restaurantDao.getRestaurant(restIdx));
+        } catch (Exception exception) {
+            System.out.println(exception);
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
+    }
 }
