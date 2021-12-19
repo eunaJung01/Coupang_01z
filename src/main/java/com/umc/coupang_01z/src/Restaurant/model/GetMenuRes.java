@@ -8,5 +8,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetMenuRes {
-
+    private int menuIdx;
+    private int restIdx;
+    private String menuDivision;
+    private String menuName;
+    private String description;
+    private int menuPrice;
+    private int isLotsOfOrders;
+    private int isBestReview;
+    private String status;
 }

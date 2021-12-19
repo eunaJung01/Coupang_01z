@@ -184,12 +184,13 @@ public class RestaurantProvider {
     }
 
     // 메뉴 조회
-//    public GetRestRes getMenu(int restIdx) throws BaseException {
-//        try {
-//            return (restaurantDao.getMenu(restIdx));
-//
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-//        }
-//    }
+    public List<GetMenuRes> getMenu(int restIdx) throws BaseException {
+        try {
+            return (restaurantDao.getMenu(restIdx));
+
+        } catch (Exception exception) {
+            System.out.println(exception);
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
+    }
 }

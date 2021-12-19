@@ -1,6 +1,5 @@
 package com.umc.coupang_01z.src.Restaurant;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.umc.coupang_01z.src.Restaurant.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,15 +111,18 @@ public class RestaurantController {
     /*
      * 메뉴 조회 : [GET] /menu/:restIdx
      */
-//    @ResponseBody
-//    @GetMapping("/menu/{restIdx}")
-//    public BaseResponse<GetRestRes> getMenu(@PathVariable("restIdx") int restIdx) {
-//        try {
-//            return new BaseResponse<>(restaurantProvider.getMenu(restIdx));
-//
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ResponseBody
+    @GetMapping("/menu/{restIdx}")
+    public BaseResponse<GetMenuResponse> getMenu(@PathVariable("restIdx") int restIdx) {
+        try {
+            GetMenuResponse getMenuResponse = new GetMenuResponse();
+            List<GetMenuRes> getMenuRes = restaurantProvider.getMenu(restIdx);
+            getMenuResponse.setMenu(getMenuRes);
+            return new BaseResponse<>(getMenuResponse);
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }
