@@ -56,41 +56,48 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/restaurant")
-    public BaseResponse<List<GetRestRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+    public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
         try {
-            List<GetRestRes> getRestRes;
+            List<GetRestListRes> getRestListRes;
 
             if (categoryIdx != null) { // 카테고리 구분 시
                 if (rate != null) { // 별점 높은 순
-                    getRestRes = restaurantProvider.getRestByRate(Integer.parseInt(categoryIdx));
+                    getRestListRes = restaurantProvider.getRestByRate(Integer.parseInt(categoryIdx));
                 } else if (isCheetah != null) { // 치타 배달
-                    getRestRes = restaurantProvider.getRestByCheetah(Integer.parseInt(categoryIdx));
+                    getRestListRes = restaurantProvider.getRestByCheetah(Integer.parseInt(categoryIdx));
                 } else if (deliveryFee != null) { // 배달비
-                    getRestRes = restaurantProvider.getRestByDeliveryFee(Integer.parseInt(categoryIdx), Integer.parseInt(deliveryFee));
+                    getRestListRes = restaurantProvider.getRestByDeliveryFee(Integer.parseInt(categoryIdx), Integer.parseInt(deliveryFee));
                 } else if (minOrderFee != null) { // 최소 주문비
-                    getRestRes = restaurantProvider.getRestByMinOrderFee(Integer.parseInt(categoryIdx), Integer.parseInt(minOrderFee));
+                    getRestListRes = restaurantProvider.getRestByMinOrderFee(Integer.parseInt(categoryIdx), Integer.parseInt(minOrderFee));
                 } else { // default
-                    getRestRes = restaurantProvider.getRest(Integer.parseInt(categoryIdx));
+                    getRestListRes = restaurantProvider.getRest(Integer.parseInt(categoryIdx));
                 }
             } else {
                 if (rate != null) { // 별점 높은 순
-                    getRestRes = restaurantProvider.getRestByRate();
+                    getRestListRes = restaurantProvider.getRestByRate();
                 } else if (isCheetah != null) { // 치타 배달
-                    getRestRes = restaurantProvider.getRestByCheetah();
+                    getRestListRes = restaurantProvider.getRestByCheetah();
                 } else if (deliveryFee != null) { // 배달비
-                    getRestRes = restaurantProvider.getRestByDeliveryFee(Integer.parseInt(deliveryFee));
+                    getRestListRes = restaurantProvider.getRestByDeliveryFee(Integer.parseInt(deliveryFee));
                 } else if (minOrderFee != null) { // 최소 주문비
-                    getRestRes = restaurantProvider.getRestByMinOrderFee(Integer.parseInt(minOrderFee));
+                    getRestListRes = restaurantProvider.getRestByMinOrderFee(Integer.parseInt(minOrderFee));
                 } else { // default
-                    getRestRes = restaurantProvider.getRest();
+                    getRestListRes = restaurantProvider.getRest();
                 }
             }
 
-            return new BaseResponse<>(getRestRes);
+            return new BaseResponse<>(getRestListRes);
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /*
+     * 음식점 조회 : [GET] /restaurant/:restaurant
+     */
+//    @ResponseBody
+//    @GetMapping("/{restaurantIdx}")
+//    public BaseResponse<GetRestRes>
 
 }

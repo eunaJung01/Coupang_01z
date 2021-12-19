@@ -29,127 +29,100 @@ public class RestaurantDao {
     }
 
     // 음식점 조회
-    public List<GetRestRes> getRest() {
+    public List<GetRestListRes> getRest() {
         String query = "SELECT * FROM Restaurant";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")
-                )
+                        rs.getInt("deliveryFee"))
         );
     }
 
     // 음식점 조회, 카테고리 구분
-    public List<GetRestRes> getRest(int categoryIdx) {
+    public List<GetRestListRes> getRest(int categoryIdx) {
         String query = "SELECT * FROM Restaurant WHERE categoryIdx = ?";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 categoryIdx
         );
     }
 
     // 음식점 조회 - 별점 높은 순
-    public List<GetRestRes> getRestByRate() {
+    public List<GetRestListRes> getRestByRate() {
         String query = "SELECT * FROM Restaurant ORDER BY rate DESC";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")
-                )
+                        rs.getInt("deliveryFee"))
         );
     }
 
     // 음식점 조회 - 별점 높은 순, 카테고리 구분
-    public List<GetRestRes> getRestByRate(int categoryIdx) {
+    public List<GetRestListRes> getRestByRate(int categoryIdx) {
         String query = "SELECT * FROM Restaurant WHERE categoryIdx = ? ORDER BY rate DESC";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 categoryIdx
         );
     }
 
     // 음식점 조회 - 치타 배달
-    public List<GetRestRes> getRestByCheetah() {
+    public List<GetRestListRes> getRestByCheetah() {
         String query = "SELECT * FROM Restaurant WHERE isCheetah = 1";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")
-                )
+                        rs.getInt("deliveryFee"))
         );
     }
 
     // 음식점 조회 - 치타 배달, 카테고리 구분
-    public List<GetRestRes> getRestByCheetah(int categoryIdx) {
+    public List<GetRestListRes> getRestByCheetah(int categoryIdx) {
         String query = "SELECT * FROM Restaurant WHERE categoryIdx = ? AND isCheetah = 1";
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 categoryIdx
         );
     }
 
     // 음식점 조회 - 배달비
-    public List<GetRestRes> getRestByDeliveryFee(int deliveryFee) {
+    public List<GetRestListRes> getRestByDeliveryFee(int deliveryFee) {
         String query;
         if (deliveryFee == 0) {
             query = "SELECT * FROM Restaurant WHERE deliveryFee is NULL";
@@ -158,24 +131,20 @@ public class RestaurantDao {
         }
 
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 deliveryFee
         );
     }
 
     // 음식점 조회 - 배달비, 카테고리 구분
-    public List<GetRestRes> getRestByDeliveryFee(int categoryIdx, int deliveryFee) {
+    public List<GetRestListRes> getRestByDeliveryFee(int categoryIdx, int deliveryFee) {
         String query;
         if (deliveryFee == 0) {
             query = "SELECT * FROM Restaurant WHERE categoryIdx = ? AND deliveryFee is NULL";
@@ -184,60 +153,48 @@ public class RestaurantDao {
         }
 
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 categoryIdx, deliveryFee
         );
     }
 
     // 음식점 조회 - 최소 주문비
-    public List<GetRestRes> getRestByMinOrderFee(int minOrderFee) {
+    public List<GetRestListRes> getRestByMinOrderFee(int minOrderFee) {
         String query = "SELECT * FROM Restaurant WHERE minOrderFee <= ?";
 
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 minOrderFee
         );
     }
 
     // 음식점 조회 - 최소 주문비
-    public List<GetRestRes> getRestByMinOrderFee(int categoryIdx, int minOrderFee) {
+    public List<GetRestListRes> getRestByMinOrderFee(int categoryIdx, int minOrderFee) {
         String query = "SELECT * FROM Restaurant WHERE categoryIdx = ? AND minOrderFee <= ?";
 
         return this.jdbcTemplate.query(query,
-                (rs, rowNum) -> new GetRestRes(
+                (rs, rowNum) -> new GetRestListRes(
                         rs.getInt("restIdx"),
                         rs.getString("restName"),
                         rs.getString("restImg"),
                         rs.getInt("categoryIdx"),
                         rs.getInt("isCheetah"),
                         rs.getDouble("rate"),
-                        rs.getInt("deliveryFee"),
-                        rs.getInt("minOrderFee"),
-                        rs.getString("restAddress"),
-                        rs.getDouble("restLatitude"),
-                        rs.getDouble("restLongitude")),
+                        rs.getInt("deliveryFee")),
                 categoryIdx, minOrderFee
         );
     }

@@ -37,7 +37,7 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회
-    public List<GetRestRes> getRest() throws BaseException {
+    public List<GetRestListRes> getRest() throws BaseException {
         try {
             return restaurantDao.getRest();
         } catch (Exception exception) {
@@ -46,7 +46,7 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회, 카테고리 구분
-    public List<GetRestRes> getRest(int categoryIdx) throws BaseException {
+    public List<GetRestListRes> getRest(int categoryIdx) throws BaseException {
         try {
             return restaurantDao.getRest();
         } catch (Exception exception) {
@@ -55,7 +55,7 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 별점 높은 순
-    public List<GetRestRes> getRestByRate() throws BaseException {
+    public List<GetRestListRes> getRestByRate() throws BaseException {
         try {
             return restaurantDao.getRestByRate();
         } catch (Exception exception) {
@@ -64,7 +64,7 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 별점 높은 순, 카테고리 구분
-    public List<GetRestRes> getRestByRate(int categoryIdx) throws BaseException {
+    public List<GetRestListRes> getRestByRate(int categoryIdx) throws BaseException {
         try {
             return restaurantDao.getRestByRate(categoryIdx);
         } catch (Exception exception) {
@@ -73,9 +73,9 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 치타 배달
-    public List<GetRestRes> getRestByCheetah() throws BaseException {
+    public List<GetRestListRes> getRestByCheetah() throws BaseException {
         try {
-            List<GetRestRes> result = restaurantDao.getRestByCheetah();
+            List<GetRestListRes> result = restaurantDao.getRestByCheetah();
             if (result.isEmpty()) {
                 throw new NullPointerException();
             } else {
@@ -89,9 +89,9 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 치타 배달, 카테고리 구분
-    public List<GetRestRes> getRestByCheetah(int categoryIdx) throws BaseException {
+    public List<GetRestListRes> getRestByCheetah(int categoryIdx) throws BaseException {
         try {
-            List<GetRestRes> result = restaurantDao.getRestByCheetah(categoryIdx);
+            List<GetRestListRes> result = restaurantDao.getRestByCheetah(categoryIdx);
             if (result.isEmpty()) {
                 throw new NullPointerException();
             } else {
@@ -105,9 +105,9 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 배달비
-    public List<GetRestRes> getRestByDeliveryFee(int deliveryFee) throws BaseException {
+    public List<GetRestListRes> getRestByDeliveryFee(int deliveryFee) throws BaseException {
         try {
-            List<GetRestRes> result = restaurantDao.getRestByDeliveryFee(deliveryFee);
+            List<GetRestListRes> result = restaurantDao.getRestByDeliveryFee(deliveryFee);
             if (result.isEmpty()) {
                 throw new NullPointerException();
             } else {
@@ -121,9 +121,9 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 배달비, 카테고리 구분
-    public List<GetRestRes> getRestByDeliveryFee(int categoryIdx, int deliveryFee) throws BaseException {
+    public List<GetRestListRes> getRestByDeliveryFee(int categoryIdx, int deliveryFee) throws BaseException {
         try {
-            List<GetRestRes> result = restaurantDao.getRestByDeliveryFee(categoryIdx, deliveryFee);
+            List<GetRestListRes> result = restaurantDao.getRestByDeliveryFee(categoryIdx, deliveryFee);
             if (result.isEmpty()) {
                 throw new NullPointerException();
             } else {
@@ -137,9 +137,9 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 최소 주문비
-    public List<GetRestRes> getRestByMinOrderFee(int minOrderFee) throws BaseException {
+    public List<GetRestListRes> getRestByMinOrderFee(int minOrderFee) throws BaseException {
         try {
-            List<GetRestRes> result = restaurantDao.getRestByMinOrderFee(minOrderFee);
+            List<GetRestListRes> result = restaurantDao.getRestByMinOrderFee(minOrderFee);
             if (result.isEmpty()) {
                 throw new NullPointerException();
             } else {
@@ -153,9 +153,9 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회 - 최소 주문비, 카테고리 구분
-    public List<GetRestRes> getRestByMinOrderFee(int categoryIdx, int minOrderFee) throws BaseException {
+    public List<GetRestListRes> getRestByMinOrderFee(int categoryIdx, int minOrderFee) throws BaseException {
         try {
-            List<GetRestRes> result = restaurantDao.getRestByMinOrderFee(categoryIdx, minOrderFee);
+            List<GetRestListRes> result = restaurantDao.getRestByMinOrderFee(categoryIdx, minOrderFee);
             if (result.isEmpty()) {
                 throw new NullPointerException();
             } else {
