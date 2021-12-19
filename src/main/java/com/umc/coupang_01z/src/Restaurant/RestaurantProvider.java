@@ -29,8 +29,8 @@ public class RestaurantProvider {
     // 카테고리 조회
     public List<GetCategoryRes> getCategory() throws BaseException {
         try {
-            List<GetCategoryRes> result = restaurantDao.getCategory();
-            return result;
+            return restaurantDao.getCategory();
+
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
@@ -40,6 +40,7 @@ public class RestaurantProvider {
     public List<GetRestListRes> getRest() throws BaseException {
         try {
             return restaurantDao.getRest();
+
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
@@ -49,6 +50,7 @@ public class RestaurantProvider {
     public List<GetRestListRes> getRest(int categoryIdx) throws BaseException {
         try {
             return restaurantDao.getRest();
+
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
@@ -58,6 +60,7 @@ public class RestaurantProvider {
     public List<GetRestListRes> getRestByRate() throws BaseException {
         try {
             return restaurantDao.getRestByRate();
+
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
@@ -67,6 +70,7 @@ public class RestaurantProvider {
     public List<GetRestListRes> getRestByRate(int categoryIdx) throws BaseException {
         try {
             return restaurantDao.getRestByRate(categoryIdx);
+
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
@@ -81,6 +85,7 @@ public class RestaurantProvider {
             } else {
                 return result;
             }
+
         } catch (NullPointerException exception) {
             throw new BaseException(NO_RESULT); // 검색 결과 없음
         } catch (Exception exception) {
@@ -172,9 +177,19 @@ public class RestaurantProvider {
     public GetRestRes getRestaurant(int restIdx) throws BaseException {
         try {
             return (restaurantDao.getRestaurant(restIdx));
+
         } catch (Exception exception) {
-            System.out.println(exception);
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
     }
+
+    // 메뉴 조회
+//    public GetRestRes getMenu(int restIdx) throws BaseException {
+//        try {
+//            return (restaurantDao.getMenu(restIdx));
+//
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+//        }
+//    }
 }

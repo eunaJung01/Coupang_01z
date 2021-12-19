@@ -226,4 +226,6 @@ public class RestaurantDao {
         );
     }
 
+//    public GetRestRes getMenu(int restIdx) {
+//    }
 }

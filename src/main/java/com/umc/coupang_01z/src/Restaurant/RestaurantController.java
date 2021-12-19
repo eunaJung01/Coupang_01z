@@ -56,8 +56,10 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/restaurant")
-    public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+    public BaseResponse<GetRestListResponse> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+//    public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
         try {
+            GetRestListResponse getRestListResponse = new GetRestListResponse();
             List<GetRestListRes> getRestListRes;
 
             if (categoryIdx != null) { // 카테고리 구분 시
@@ -85,8 +87,8 @@ public class RestaurantController {
                     getRestListRes = restaurantProvider.getRest();
                 }
             }
-
-            return new BaseResponse<>(getRestListRes);
+            getRestListResponse.setRestaurantList(getRestListRes);
+            return new BaseResponse<GetRestListResponse>(getRestListResponse);
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
@@ -106,5 +108,19 @@ public class RestaurantController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /*
+     * 메뉴 조회 : [GET] /menu/:restIdx
+     */
+//    @ResponseBody
+//    @GetMapping("/menu/{restIdx}")
+//    public BaseResponse<GetRestRes> getMenu(@PathVariable("restIdx") int restIdx) {
+//        try {
+//            return new BaseResponse<>(restaurantProvider.getMenu(restIdx));
+//
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
 
 }
