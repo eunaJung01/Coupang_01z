@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.umc.coupang_01z.utils.JwtService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.umc.coupang_01z.config.BaseResponseStatus.*;
@@ -183,14 +184,62 @@ public class RestaurantProvider {
         }
     }
 
-    // 메뉴 조회
-    public List<GetMenuRes> getMenu(int restIdx) throws BaseException {
+    // 메뉴 전체 조회
+    public List<GetMenuRes> getMenuList(int restIdx) throws BaseException {
         try {
-            return (restaurantDao.getMenu(restIdx));
+            return (restaurantDao.getMenuList(restIdx));
 
         } catch (Exception exception) {
-            System.out.println(exception);
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
     }
+
+    // 특정 메뉴 조회
+    public GetMenuRes getMenu(int menuIdx) throws BaseException {
+        try {
+            return restaurantDao.getMenu(menuIdx);
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
+    }
+
+    // 옵션 조회
+    /*
+     * Option & Option Child 조회 : [GET] /menu/:restIdx/:menuIdx
+     *
+     * in Option table
+     *      1. restIdx != null : 모든 메뉴에 공통적으로 뜨는 옵션
+     *         menuIdx != null : 해당 메뉴에만 뜨는 옵션
+     *      2. hasChild = 1 : OptionChild 존재 O
+     *                  = 0 : OptionChild 존재 X
+     * Option으로 띄워줘야 하는 값이 없는 경우 : 안드로이드에서 메뉴 가격, 수량 선택만 띄워줌
+     */
+//    public List<GetOptionRes> getOption(int restIdx, int menuIdx) throws BaseException {
+//        try {
+//            List<GetOptionRes> getOptionRes = new ArrayList<>();
+//
+//            // 해당 메뉴에만 뜨는 옵션인가?
+//            if (!restaurantDao.isMenuIdxNull(menuIdx)) {
+//                if (restaurantDao.hasMenuOptionChild(menuIdx)) { // OptionChild 존재 O
+//                    getOptionRes.add(restaurantDao.getMenuOptionChild(menuIdx));
+//                } else { // OptionChild 존재 X
+//                    getOptionRes.add(restaurantDao.getMenuOption(menuIdx));
+//                }
+//            }
+//            // 모든 메뉴에 공통적으로 뜨는 옵션인가?
+//            if (!restaurantDao.isRestIdxNull(restIdx)) {
+//                if (restaurantDao.hasRestOptionChild(restIdx)) { // OptionChild 존재 O
+//                    getOptionRes.add(restaurantDao.getRestOptionChild(restIdx));
+//                } else { // OptionChild 존재 X
+//                    getOptionRes.add(restaurantDao.getRestOption(restIdx));
+//                }
+//            }
+//            return getOptionRes;
+//
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+//        }
+//    }
+
 }

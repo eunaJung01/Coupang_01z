@@ -226,8 +226,8 @@ public class RestaurantDao {
         );
     }
 
-    // 메뉴 조회
-    public List<GetMenuRes> getMenu(int restIdx) {
+    // 메뉴 전체 조회
+    public List<GetMenuRes> getMenuList(int restIdx) {
         String query = "SELECT * FROM Menu WHERE restIdx = ?";
 
         return this.jdbcTemplate.query(query,
@@ -244,5 +244,26 @@ public class RestaurantDao {
                 restIdx
         );
     }
+
+    // 특정 메뉴 조회
+    public GetMenuRes getMenu(int menuIdx) {
+        String query = "SELECT * FROM Menu WHERE menuIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetMenuRes(
+                        rs.getInt("menuIdx"),
+                        rs.getInt("restIdx"),
+                        rs.getString("menuDivision"),
+                        rs.getString("menuName"),
+                        rs.getString("description"),
+                        rs.getInt("menuPrice"),
+                        rs.getInt("isLotsOfOrders"),
+                        rs.getInt("isBestReview"),
+                        rs.getString("status")),
+                menuIdx
+        );
+    }
+
+
 
 }

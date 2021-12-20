@@ -55,10 +55,10 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/restaurant")
-    public BaseResponse<GetRestListResponse> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
-//    public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+//    public BaseResponse<GetRestListResponse> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+    public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
         try {
-            GetRestListResponse getRestListResponse = new GetRestListResponse();
+//            GetRestListResponse getRestListResponse = new GetRestListResponse();
             List<GetRestListRes> getRestListRes;
 
             if (categoryIdx != null) { // 카테고리 구분 시
@@ -86,8 +86,9 @@ public class RestaurantController {
                     getRestListRes = restaurantProvider.getRest();
                 }
             }
-            getRestListResponse.setRestaurantList(getRestListRes);
-            return new BaseResponse<GetRestListResponse>(getRestListResponse);
+//            getRestListResponse.setRestaurantList(getRestListRes);
+//            return new BaseResponse<GetRestListResponse>(getRestListResponse);
+            return new BaseResponse<>(getRestListRes);
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
@@ -109,20 +110,48 @@ public class RestaurantController {
     }
 
     /*
-     * 메뉴 조회 : [GET] /menu/:restIdx
+     * 메뉴 전체 조회 : [GET] /menu/:restIdx
      */
     @ResponseBody
     @GetMapping("/menu/{restIdx}")
-    public BaseResponse<GetMenuResponse> getMenu(@PathVariable("restIdx") int restIdx) {
+//    public BaseResponse<GetMenuResponse> getMenu(@PathVariable("restIdx") int restIdx) {
+    public BaseResponse<List<GetMenuRes>> getMenu(@PathVariable("restIdx") int restIdx) {
         try {
-            GetMenuResponse getMenuResponse = new GetMenuResponse();
-            List<GetMenuRes> getMenuRes = restaurantProvider.getMenu(restIdx);
-            getMenuResponse.setMenu(getMenuRes);
-            return new BaseResponse<>(getMenuResponse);
+//            GetMenuResponse getMenuResponse = new GetMenuResponse();
+//            List<GetMenuRes> getMenuRes = restaurantProvider.getMenuList(restIdx);
+//            getMenuResponse.setMenu(getMenuRes);
+//            return new BaseResponse<>(getMenuResponse);
+            return new BaseResponse<>(restaurantProvider.getMenuList(restIdx));
 
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /*
+     * Option & Option Child 조회 : [GET] /menu/:restIdx/:menuIdx
+     *
+     * in Option table
+     *      1. restIdx != null : 모든 메뉴에 공통적으로 뜨는 옵션
+     *         menuIdx != null : 해당 메뉴에만 뜨는 옵션
+     *      2. hasChild = 1 : OptionChild 존재 O
+     *                  = 0 : OptionChild 존재 X
+     * Option으로 띄워줘야 하는 값이 없는 경우 : 안드로이드에서 메뉴 가격, 수량 선택만 띄워줌
+     */
+//    @ResponseBody
+//    @GetMapping("/menu/{restIdx}/{menuIdx}")
+//    public BaseResponse<GetOptionResponse> getOption(@PathVariable("restIdx") int restIdx, @PathVariable("restIdx") int menuIdx) {
+//        try {
+//            GetMenuRes getMenuRes = restaurantProvider.getMenu(menuIdx); // 특정 메뉴 조회
+//
+//            GetOptionResponse getOptionResponse = new GetOptionResponse();
+//            List<GetOptionRes> getOptionRes = restaurantProvider.getOption(restIdx, menuIdx);
+//            getOptionResponse.setListGetOptionRes(getOptionRes);
+//            return new BaseResponse<>(getOptionResponse);
+//
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
 
 }

@@ -1,3 +1,5 @@
+// for 메르
+
 package com.umc.coupang_01z.src.Restaurant.model;
 
 import lombok.AllArgsConstructor;
