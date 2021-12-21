@@ -10,9 +10,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class GetOptionResponse {
-    private GetMenuRes getMenuRes;
-    private List<GetOptionRes> listGetOptionRes;
+    private GetOptionRes option;
+    private List<GetOptionChildRes> optionChildList;
 
-    public GetOptionResponse() {
+    public GetOptionResponse(GetOptionRes option) {
+        this.option = option;
     }
+
 }

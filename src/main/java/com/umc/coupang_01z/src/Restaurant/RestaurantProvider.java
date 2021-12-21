@@ -184,7 +184,7 @@ public class RestaurantProvider {
         }
     }
 
-    // 메뉴 전체 조회
+    // 메뉴 리스트 조회
     public List<GetMenuRes> getMenuList(int restIdx) throws BaseException {
         try {
             return (restaurantDao.getMenuList(restIdx));
@@ -194,7 +194,7 @@ public class RestaurantProvider {
         }
     }
 
-    // 특정 메뉴 조회
+    // 메뉴 조회
     public GetMenuRes getMenu(int menuIdx) throws BaseException {
         try {
             return restaurantDao.getMenu(menuIdx);
@@ -204,42 +204,47 @@ public class RestaurantProvider {
         }
     }
 
-    // 옵션 조회
-    /*
-     * Option & Option Child 조회 : [GET] /menu/:restIdx/:menuIdx
-     *
-     * in Option table
-     *      1. restIdx != null : 모든 메뉴에 공통적으로 뜨는 옵션
-     *         menuIdx != null : 해당 메뉴에만 뜨는 옵션
-     *      2. hasChild = 1 : OptionChild 존재 O
-     *                  = 0 : OptionChild 존재 X
-     * Option으로 띄워줘야 하는 값이 없는 경우 : 안드로이드에서 메뉴 가격, 수량 선택만 띄워줌
-     */
-//    public List<GetOptionRes> getOption(int restIdx, int menuIdx) throws BaseException {
-//        try {
-//            List<GetOptionRes> getOptionRes = new ArrayList<>();
-//
-//            // 해당 메뉴에만 뜨는 옵션인가?
-//            if (!restaurantDao.isMenuIdxNull(menuIdx)) {
-//                if (restaurantDao.hasMenuOptionChild(menuIdx)) { // OptionChild 존재 O
-//                    getOptionRes.add(restaurantDao.getMenuOptionChild(menuIdx));
-//                } else { // OptionChild 존재 X
-//                    getOptionRes.add(restaurantDao.getMenuOption(menuIdx));
-//                }
-//            }
-//            // 모든 메뉴에 공통적으로 뜨는 옵션인가?
-//            if (!restaurantDao.isRestIdxNull(restIdx)) {
-//                if (restaurantDao.hasRestOptionChild(restIdx)) { // OptionChild 존재 O
-//                    getOptionRes.add(restaurantDao.getRestOptionChild(restIdx));
-//                } else { // OptionChild 존재 X
-//                    getOptionRes.add(restaurantDao.getRestOption(restIdx));
-//                }
-//            }
-//            return getOptionRes;
-//
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-//        }
-//    }
+    // 옵션 & 세부 옵션 리스트 조회
+    public List<GetOptionResponse> getOptionResponseList(int restIdx, int menuIdx) throws BaseException {
+        try {
+            List<GetOptionResponse> getOptionResponseList = new ArrayList<>();
+
+            // 해당 메뉴에만 뜨는 옵션인가?
+            if (restaurantDao.hasMenuIdx(menuIdx) == 1) {
+                List<Integer> menuOptionIdxList = restaurantDao.getMenuOptionIdx(menuIdx); // 해당 메뉴에 해당하는 옵션 인덱스들 (List)
+                for (Integer optionIdx : menuOptionIdxList) {
+                    if (restaurantDao.hasOptionChild(optionIdx) == 1) { // OptionChild 존재 O
+                        getOptionResponseList.add(new GetOptionResponse(restaurantDao.getOption(optionIdx), restaurantDao.getOptionChild(optionIdx)));
+                    } else { // OptionChild 존재 X
+                        getOptionResponseList.add(new GetOptionResponse(restaurantDao.getOption(optionIdx)));
+                    }
+                }
+            }
+
+            // 모든 메뉴에 공통적으로 뜨는 옵션인가?
+            if (restaurantDao.hasRestIdx(restIdx) == 1) {
+                List<Integer> restOptionIdxList = restaurantDao.getRestOptionIdx(restIdx); // 해당 음식점에 해당하는 옵션 인덱스들 (List)
+                for (Integer optionIdx : restOptionIdxList) {
+                    if (restaurantDao.hasOptionChild(optionIdx) == 1) { // OptionChild 존재 O
+                        getOptionResponseList.add(new GetOptionResponse(restaurantDao.getOption(optionIdx), restaurantDao.getOptionChild(optionIdx)));
+                    } else { // OptionChild 존재 X
+                        getOptionResponseList.add(new GetOptionResponse(restaurantDao.getOption(optionIdx)));
+                    }
+                }
+            }
+
+            // 메뉴에 옵션이 없는 경우 -> 클라이언트에서 메뉴 가격, 수량 선택만 화면에 띄워주기
+            if (getOptionResponseList.isEmpty()) {
+                throw new NullPointerException();
+            }
+
+            return getOptionResponseList;
+
+        } catch (NullPointerException exception) {
+            throw new BaseException(NO_OPTION); // 해당 메뉴에 옵션 없음
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
+    }
 
 }

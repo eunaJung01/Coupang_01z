@@ -226,7 +226,7 @@ public class RestaurantDao {
         );
     }
 
-    // 메뉴 전체 조회
+    // 메뉴 리스트 조회
     public List<GetMenuRes> getMenuList(int restIdx) {
         String query = "SELECT * FROM Menu WHERE restIdx = ?";
 
@@ -264,6 +264,65 @@ public class RestaurantDao {
         );
     }
 
+    // is menuIdx != null in Option table?
+    public int hasMenuIdx(int menuIdx) {
+        String query = "SELECT EXISTS(SELECT menuIdx FROM Coupang_eats.Option WHERE menuIdx = ?)";
+        return this.jdbcTemplate.queryForObject(query, int.class, menuIdx);
+    }
 
+    // is restIdx != null in Option table?
+    public int hasRestIdx(int restIdx) {
+        String query = "SELECT EXISTS(SELECT restIdx FROM Coupang_eats.Option WHERE restIdx = ?)";
+        return this.jdbcTemplate.queryForObject(query, int.class, restIdx);
+    }
+
+    // hasChild 반환
+    public int hasOptionChild(int optionIdx) {
+        String query = "SELECT hasChild FROM Coupang_eats.Option WHERE optionIdx = ?";
+        return this.jdbcTemplate.queryForObject(query, int.class, optionIdx);
+    }
+
+    // 메뉴에 해당하는 optionIdx - List로 반환
+    public List<Integer> getMenuOptionIdx(int menuIdx) {
+        String query = "SELECT optionIdx FROM Coupang_eats.Option WHERE menuIdx = ?";
+        return this.jdbcTemplate.queryForList(query, Integer.class, menuIdx);
+    }
+
+    public List<Integer> getRestOptionIdx(int restIdx) {
+        String query = "SELECT optionIdx FROM Coupang_eats.Option WHERE restIdx = ?";
+        return this.jdbcTemplate.queryForList(query, Integer.class, restIdx);
+    }
+
+    // 옵션 정보 반환
+    public GetOptionRes getOption(int optionIdx) {
+        String query = "SELECT * FROM Coupang_eats.Option WHERE optionIdx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs, rowNum) -> new GetOptionRes(
+                        rs.getInt("restIdx"),
+                        rs.getInt("menuIdx"),
+                        rs.getInt("optionIdx"),
+                        rs.getString("optionName"),
+                        rs.getInt("isRequired"),
+                        rs.getInt("isRadioButton"),
+                        rs.getInt("hasChild"),
+                        rs.getString("status")),
+                optionIdx
+        );
+    }
+
+    // 세부 옵션 리스트 반환
+    public List<GetOptionChildRes> getOptionChild(int optionIdx) {
+        String query = "SELECT * FROM OptionChild WHERE optionIdx = ?";
+
+        return this.jdbcTemplate.query(query,
+                (rs, rowNum) -> new GetOptionChildRes(
+                        rs.getInt("optCldIdx"),
+                        rs.getString("optCldName"),
+                        rs.getInt("optCldPrice"),
+                        rs.getString("status")),
+                optionIdx
+        );
+    }
 
 }

@@ -8,8 +8,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetOptionRes {
-    private int optCldIdx;
-    private String optCldName;
-    private int optCldPrice;
+    private int restIdx;
+    private int menuIdx;
+    private int optionIdx;
+    private String optionName;
+    private int isRequired;
+    private int isRadioButton;
+    private int hasChild;
     private String status;
 }

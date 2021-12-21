@@ -60,7 +60,8 @@ public enum BaseResponseStatus {
     POST_USERS_NOT_REGSTERED_EMAIL(false, 5001, "가입되지 않은 이메일입니다."),
 
     // 6000 : 필요시 만들어서 쓰세요 - 레마
-    NO_RESULT(false, 6000, "검색 결과 없음");
+    NO_RESULT(false, 6000, "검색 결과 없음"),
+    NO_OPTION(false, 6000, "해당 메뉴에 옵션 없음");
 
     private final boolean isSuccess;
     private final int code;

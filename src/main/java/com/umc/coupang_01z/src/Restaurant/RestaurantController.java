@@ -8,6 +8,7 @@ import com.umc.coupang_01z.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -110,7 +111,7 @@ public class RestaurantController {
     }
 
     /*
-     * 메뉴 전체 조회 : [GET] /menu/:restIdx
+     * 메뉴 리스트 조회 : [GET] /menu/:restIdx
      */
     @ResponseBody
     @GetMapping("/menu/{restIdx}")
@@ -129,29 +130,39 @@ public class RestaurantController {
     }
 
     /*
-     * Option & Option Child 조회 : [GET] /menu/:restIdx/:menuIdx
+     * 옵션 & 세부 옵션 조회 : [GET] /menu/:restIdx/:menuIdx
      *
      * in Option table
      *      1. restIdx != null : 모든 메뉴에 공통적으로 뜨는 옵션
      *         menuIdx != null : 해당 메뉴에만 뜨는 옵션
      *      2. hasChild = 1 : OptionChild 존재 O
      *                  = 0 : OptionChild 존재 X
-     * Option으로 띄워줘야 하는 값이 없는 경우 : 안드로이드에서 메뉴 가격, 수량 선택만 띄워줌
+     * 해당 메뉴에 옵션이 없는 경우 : 클라이언트에서 메뉴 사진, 가격, 수량 선택만 화면에 띄워주기
+     *
+     * < Response >
+     *  GetOptionListResponse
+     *      1. GetMenuRes : 메뉴 정보 (menu)
+     *      2. List<GetOptionResponse> : 옵션 리스트 (optionList)
+                    (1) GetOptionRes : 옵션 정보 (option)
+     *              (2) List<GetOptionChildRes> : 세부 옵션 리스트 (optionChildList)
      */
-//    @ResponseBody
-//    @GetMapping("/menu/{restIdx}/{menuIdx}")
-//    public BaseResponse<GetOptionResponse> getOption(@PathVariable("restIdx") int restIdx, @PathVariable("restIdx") int menuIdx) {
-//        try {
-//            GetMenuRes getMenuRes = restaurantProvider.getMenu(menuIdx); // 특정 메뉴 조회
-//
-//            GetOptionResponse getOptionResponse = new GetOptionResponse();
-//            List<GetOptionRes> getOptionRes = restaurantProvider.getOption(restIdx, menuIdx);
-//            getOptionResponse.setListGetOptionRes(getOptionRes);
-//            return new BaseResponse<>(getOptionResponse);
-//
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ResponseBody
+    @GetMapping("/menu/{restIdx}/{menuIdx}")
+    public BaseResponse<GetOptionListResponse> getOption(@PathVariable("restIdx") int restIdx, @PathVariable("menuIdx") int menuIdx) {
+        try {
+            GetOptionListResponse getOptionListResponse = new GetOptionListResponse();
+
+            GetMenuRes getMenuRes = restaurantProvider.getMenu(menuIdx); // 메뉴 정보
+            getOptionListResponse.setMenu(getMenuRes);
+
+            List<GetOptionResponse> getOptionResponseList = restaurantProvider.getOptionResponseList(restIdx, menuIdx); // 옵션 정보 & 세부 옵션 리스트
+            getOptionListResponse.setOptionList(getOptionResponseList);
+
+            return new BaseResponse<>(getOptionListResponse);
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }

@@ -1,4 +1,3 @@
-// for 메르
 package com.umc.coupang_01z.src.Restaurant.model;
 
 import lombok.AllArgsConstructor;
@@ -10,9 +9,11 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetMenuResponse {
-    private List<GetMenuRes> menu;
+public class GetOptionListResponse {
+    private GetMenuRes menu;
+    private List<GetOptionResponse> optionList;
 
-    public GetMenuResponse() {
+    public GetOptionListResponse() {
     }
+
 }
