@@ -56,10 +56,8 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/restaurant")
-//    public BaseResponse<GetRestListResponse> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
     public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
         try {
-//            GetRestListResponse getRestListResponse = new GetRestListResponse();
             List<GetRestListRes> getRestListRes;
 
             if (categoryIdx != null) { // 카테고리 구분 시
@@ -87,8 +85,6 @@ public class RestaurantController {
                     getRestListRes = restaurantProvider.getRest();
                 }
             }
-//            getRestListResponse.setRestaurantList(getRestListRes);
-//            return new BaseResponse<GetRestListResponse>(getRestListResponse);
             return new BaseResponse<>(getRestListRes);
 
         } catch (BaseException exception) {
@@ -115,13 +111,8 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/menu/{restIdx}")
-//    public BaseResponse<GetMenuResponse> getMenu(@PathVariable("restIdx") int restIdx) {
     public BaseResponse<List<GetMenuRes>> getMenu(@PathVariable("restIdx") int restIdx) {
         try {
-//            GetMenuResponse getMenuResponse = new GetMenuResponse();
-//            List<GetMenuRes> getMenuRes = restaurantProvider.getMenuList(restIdx);
-//            getMenuResponse.setMenu(getMenuRes);
-//            return new BaseResponse<>(getMenuResponse);
             return new BaseResponse<>(restaurantProvider.getMenuList(restIdx));
 
         } catch (BaseException exception) {
@@ -135,8 +126,8 @@ public class RestaurantController {
      * in Option table
      *      1. restIdx != null : 모든 메뉴에 공통적으로 뜨는 옵션
      *         menuIdx != null : 해당 메뉴에만 뜨는 옵션
-     *      2. hasChild = 1 : OptionChild 존재 O
-     *                  = 0 : OptionChild 존재 X
+     *      2. hasChild == 1 : OptionChild 존재 O
+     *                  == 0 : OptionChild 존재 X
      * 해당 메뉴에 옵션이 없는 경우 : 클라이언트에서 메뉴 사진, 가격, 수량 선택만 화면에 띄워주기
      *
      * < Response >
