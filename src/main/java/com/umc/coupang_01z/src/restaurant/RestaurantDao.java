@@ -1,6 +1,6 @@
-package com.umc.coupang_01z.src.Restaurant;
+package com.umc.coupang_01z.src.restaurant;
 
-import com.umc.coupang_01z.src.Restaurant.model.*;
+import com.umc.coupang_01z.src.restaurant.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,6 @@
-package com.umc.coupang_01z.src.Restaurant;
+package com.umc.coupang_01z.src.restaurant;
 
-import com.umc.coupang_01z.src.Restaurant.model.*;
+import com.umc.coupang_01z.src.restaurant.model.*;
 import com.umc.coupang_01z.config.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

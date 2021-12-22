@@ -1,4 +1,4 @@
-package com.umc.coupang_01z.src.Restaurant;
+package com.umc.coupang_01z.src.restaurant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

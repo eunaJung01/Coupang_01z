@@ -1,4 +1,4 @@
-package com.umc.coupang_01z.src.Restaurant.model;
+package com.umc.coupang_01z.src.restaurant.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

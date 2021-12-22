@@ -1,4 +1,4 @@
-package com.umc.coupang_01z.src.Restaurant.model;
+package com.umc.coupang_01z.src.restaurant.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetRestListRes {
+public class GetRestRes {
     private int restIdx;
     private String restName;
     private String restImg;
@@ -15,4 +15,8 @@ public class GetRestListRes {
     private int isCheetah;
     private double rate;
     private int deliveryFee;
+    private int minOrderFee;
+    private String restAddress;
+    private double restLatitude;
+    private double restLongitude;
 }

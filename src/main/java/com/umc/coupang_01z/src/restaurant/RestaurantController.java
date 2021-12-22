@@ -1,6 +1,6 @@
-package com.umc.coupang_01z.src.Restaurant;
+package com.umc.coupang_01z.src.restaurant;
 
-import com.umc.coupang_01z.src.Restaurant.model.*;
+import com.umc.coupang_01z.src.restaurant.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.umc.coupang_01z.config.*;
@@ -8,9 +8,7 @@ import com.umc.coupang_01z.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/coupang-eats")
@@ -134,7 +132,7 @@ public class RestaurantController {
      *  GetOptionListResponse
      *      1. GetMenuRes : 메뉴 정보 (menu)
      *      2. List<GetOptionResponse> : 옵션 리스트 (optionList)
-                    (1) GetOptionRes : 옵션 정보 (option)
+     *              (1) GetOptionRes : 옵션 정보 (option)
      *              (2) List<GetOptionChildRes> : 세부 옵션 리스트 (optionChildList)
      */
     @ResponseBody
