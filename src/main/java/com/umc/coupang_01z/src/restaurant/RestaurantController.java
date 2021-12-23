@@ -54,7 +54,7 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/restaurant")
-    public BaseResponse<List<GetRestListRes>> getRestaurantsInCategory(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+    public BaseResponse<List<GetRestListRes>> getRestaurants(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
         try {
             List<GetRestListRes> getRestListRes;
 
