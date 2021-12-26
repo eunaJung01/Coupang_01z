@@ -39,6 +39,9 @@ public class RestaurantProvider {
     public List<GetRestListRes> filterRestaurants(String[] filtering, int sortIdx, int userIdx) throws BaseException {
         try {
             List<GetRestListRes> filteredRestaurants = restaurantDao.getRestByFiltering(filtering, sortIdx);
+            if (filteredRestaurants.isEmpty()) {
+                throw new NullPointerException();
+            }
 
             // set distance field
             List<Location> location = new ArrayList<>();
@@ -55,6 +58,8 @@ public class RestaurantProvider {
 
             return filteredRestaurants;
 
+        } catch (NullPointerException exception) {
+            throw new BaseException(NO_RESULT); // 검색 결과 없음
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
