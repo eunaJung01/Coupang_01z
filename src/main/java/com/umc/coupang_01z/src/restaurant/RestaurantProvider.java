@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.umc.coupang_01z.utils.JwtService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.umc.coupang_01z.config.BaseResponseStatus.*;
-
 
 @Service
 public class RestaurantProvider {
@@ -38,137 +36,98 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회
-    public List<GetRestListRes> getRest() throws BaseException {
+    public List<GetRestListRes> filterRestaurants(String[] filtering, int sortIdx, int userIdx) throws BaseException {
         try {
-            return restaurantDao.getRest();
+            List<GetRestListRes> filteredRestaurants = restaurantDao.getRestByFiltering(filtering, sortIdx);
 
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-        }
-    }
+            // set distance field
+            List<Location> location = new ArrayList<>();
+            location.add(restaurantDao.getLocation(userIdx)); // location.get(0) : userIdx, latitude, longitude (사용자 위치정보 - status = 'C')
+            for (GetRestListRes restaurant : filteredRestaurants) {
+                location.add(restaurantDao.getRestLocation(restaurant.getRestIdx())); // restIdx, restLatitude, restLongitude (음식점 위치정보)
+            }
+            getDistances(location, filteredRestaurants); // 사용자 위치와 음식점 간의 거리 계산
 
-    // 음식점 리스트 조회, 카테고리 구분
-    public List<GetRestListRes> getRest(int categoryIdx) throws BaseException {
-        try {
-            return restaurantDao.getRest();
-
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-        }
-    }
-
-    // 음식점 리스트 조회 - 별점 높은 순
-    public List<GetRestListRes> getRestByRate() throws BaseException {
-        try {
-            return restaurantDao.getRestByRate();
-
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-        }
-    }
-
-    // 음식점 리스트 조회 - 별점 높은 순, 카테고리 구분
-    public List<GetRestListRes> getRestByRate(int categoryIdx) throws BaseException {
-        try {
-            return restaurantDao.getRestByRate(categoryIdx);
-
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-        }
-    }
-
-    // 음식점 리스트 조회 - 치타 배달
-    public List<GetRestListRes> getRestByCheetah() throws BaseException {
-        try {
-            List<GetRestListRes> result = restaurantDao.getRestByCheetah();
-            if (result.isEmpty()) {
-                throw new NullPointerException();
-            } else {
-                return result;
+            // set rateNum field
+            for (GetRestListRes filteredRestaurant : filteredRestaurants) {
+                filteredRestaurant.setRateNum(restaurantDao.getRateNum(filteredRestaurant.getRestIdx())); // 리뷰 개수 반환
             }
 
-        } catch (NullPointerException exception) {
-            throw new BaseException(NO_RESULT); // 검색 결과 없음
+            return filteredRestaurants;
+
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
     }
 
-    // 음식점 리스트 조회 - 치타 배달, 카테고리 구분
-    public List<GetRestListRes> getRestByCheetah(int categoryIdx) throws BaseException {
-        try {
-            List<GetRestListRes> result = restaurantDao.getRestByCheetah(categoryIdx);
-            if (result.isEmpty()) {
-                throw new NullPointerException();
-            } else {
-                return result;
-            }
-        } catch (NullPointerException exception) {
-            throw new BaseException(NO_RESULT); // 검색 결과 없음
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+    // 사용자 위치와 음식점 간의 거리 계산
+    private void getDistances(List<Location> location, List<GetRestListRes> filteredRestaurants) {
+        double userLat = location.get(0).getLat(); // 사용자 latitude
+        double userLng = location.get(0).getLng(); // 사용자 longitude
+
+        for (int i = 1; i < location.size(); i++) {
+            double distance = distanceInKilometerByHaversine(userLat, userLng, location.get(i).getLat(), location.get(i).getLat()); // 최단 거리 구하기
+            filteredRestaurants.get(i - 1).setDistance(distance); // 각각의 distance 필드에 저장
         }
     }
 
-    // 음식점 리스트 조회 - 배달비
-    public List<GetRestListRes> getRestByDeliveryFee(int deliveryFee) throws BaseException {
-        try {
-            List<GetRestListRes> result = restaurantDao.getRestByDeliveryFee(deliveryFee);
-            if (result.isEmpty()) {
-                throw new NullPointerException();
-            } else {
-                return result;
-            }
-        } catch (NullPointerException exception) {
-            throw new BaseException(NO_RESULT); // 검색 결과 없음
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-        }
+    // Haversine Formula : 최단 거리 구하기 (https://kayuse88.github.io/haversine/)
+    public double distanceInKilometerByHaversine(double x1, double y1, double x2, double y2) {
+        double distance;
+        double radius = 6371; // 지구 반지름(km)
+        double toRadian = Math.PI / 180;
+
+        double deltaLatitude = Math.abs(x1 - x2) * toRadian;
+        double deltaLongitude = Math.abs(y1 - y2) * toRadian;
+
+        double sinDeltaLat = Math.sin(deltaLatitude / 2);
+        double sinDeltaLng = Math.sin(deltaLongitude / 2);
+        double squareRoot = Math.sqrt(sinDeltaLat * sinDeltaLat + Math.cos(x1 * toRadian) * Math.cos(x2 * toRadian) * sinDeltaLng * sinDeltaLng);
+
+        distance = 2 * radius * Math.asin(squareRoot);
+
+        return distance;
     }
 
-    // 음식점 리스트 조회 - 배달비, 카테고리 구분
-    public List<GetRestListRes> getRestByDeliveryFee(int categoryIdx, int deliveryFee) throws BaseException {
-        try {
-            List<GetRestListRes> result = restaurantDao.getRestByDeliveryFee(categoryIdx, deliveryFee);
-            if (result.isEmpty()) {
-                throw new NullPointerException();
-            } else {
-                return result;
-            }
-        } catch (NullPointerException exception) {
-            throw new BaseException(NO_RESULT); // 검색 결과 없음
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+//    // 매장 정렬 : 추천순
+//    public List<GetRestListRes> sortByRecommend(List<GetRestListRes> getRestListRes) {
+//    }
+
+    // 매장 정렬 : 주문 많은 순
+    public List<GetRestListRes> sortByOrderNum(List<GetRestListRes> getRestListRes) throws BaseException {
+        Set<Integer> findRestIdx = new HashSet<>(); // getRestListRes에 있는 restIdx 목록
+        for (GetRestListRes restaurants : getRestListRes) {
+            findRestIdx.add(restaurants.getRestIdx());
         }
+        List<Integer> restIdxList = new ArrayList<>(findRestIdx); // Set -> List
+
+        Map<Integer, Integer> filteredRestaurants = new HashMap<>(); // restIdx - COUNT(Order.restIdx)
+        for (Integer restIdx : restIdxList) {
+            filteredRestaurants.put(restIdx, restaurantDao.countRestIdx(restIdx)); // 음식점별 주문 횟수
+        }
+
+        // sort filteredRestaurants
+        List<Map.Entry<Integer, Integer>> filteredRestaurants_sorted = new LinkedList<>(filteredRestaurants.entrySet());
+        filteredRestaurants_sorted.sort((o1, o2) -> (int) (o2.getValue()) - o1.getValue()); // 내림차순 정렬 (COUNT(Order.restIdx) 기준)
+
+        // sort getRestListRes
+        List<GetRestListRes> getRestListRes_sorted = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> sortOrder : filteredRestaurants_sorted) {
+            for (GetRestListRes getRestList : getRestListRes) {
+                if (sortOrder.getKey() == getRestList.getRestIdx()) {
+                    getRestListRes_sorted.add(getRestList);
+                }
+            }
+        }
+
+        return getRestListRes_sorted;
     }
 
-    // 음식점 리스트 조회 - 최소 주문비
-    public List<GetRestListRes> getRestByMinOrderFee(int minOrderFee) throws BaseException {
+    // 매장 정렬 : 가까운 순
+    public void sortByDistance(List<GetRestListRes> getRestListRes) throws BaseException {
         try {
-            List<GetRestListRes> result = restaurantDao.getRestByMinOrderFee(minOrderFee);
-            if (result.isEmpty()) {
-                throw new NullPointerException();
-            } else {
-                return result;
-            }
-        } catch (NullPointerException exception) {
-            throw new BaseException(NO_RESULT); // 검색 결과 없음
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
-        }
-    }
+            Collections.sort(getRestListRes); // distance 기준 내림차순 정렬
 
-    // 음식점 리스트 조회 - 최소 주문비, 카테고리 구분
-    public List<GetRestListRes> getRestByMinOrderFee(int categoryIdx, int minOrderFee) throws BaseException {
-        try {
-            List<GetRestListRes> result = restaurantDao.getRestByMinOrderFee(categoryIdx, minOrderFee);
-            if (result.isEmpty()) {
-                throw new NullPointerException();
-            } else {
-                return result;
-            }
-        } catch (NullPointerException exception) {
-            throw new BaseException(NO_RESULT); // 검색 결과 없음
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }

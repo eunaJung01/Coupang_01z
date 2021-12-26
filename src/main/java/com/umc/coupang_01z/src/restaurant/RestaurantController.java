@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.umc.coupang_01z.config.BaseResponseStatus.*;
+
 @RestController
 @RequestMapping("/coupang-eats")
 public class RestaurantController {
@@ -44,45 +46,52 @@ public class RestaurantController {
     }
 
     /*
-     * 음식점 리스트 조회
-     * 카테고리 구분 : [GET] /restaurant?categoryIdx
-     * 1. default : [GET] /restaurant
-     * 1. 별점 높은 순 : [GET] /restaurant?rate
-     * 2. 치타 배달 : [GET] /restaurant?isCheetah
-     * 3. 배달비 : [GET] /restaurant?deliveryFee
-     * 4. 최소 주문비 : [GET] /restaurant?minOrderFee
+     * 음식점 리스트 조회 : [GET] /restaurant
+     * sorting (매장 정렬)
+     *      - 1. 추천순 : 기준이 뭘까??
+     *      - 2. 주문 많은 순 : COUNT(Order.restIdx)
+     *      - 3. 가까운 순 : Restaurant.latitude, Restaurant.longitude 거리 계산, userIdx 필요
+     *      - 4. 별점 높은 순 : Restaurant.rate
+     *      - 5. 신규 매장 순 : Restaurant.createAt
+     * filtering
+     *      - 1. 카테고리 구분 categoryIdx
+     *      - 2. 치타 배달 isCheetah = true
+     *      - 3. 배달비 deliveryFee
+     *      - 4. 최소 주문 minOrderFee
+     *      - 5. 포장 packaging = true
      */
     @ResponseBody
     @GetMapping("/restaurant")
-    public BaseResponse<List<GetRestListRes>> getRestaurants(@RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String rate, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee) throws BaseException {
+    public BaseResponse<List<GetRestListRes>> getRestaurants(@RequestParam(required = false) String sortIdx, @RequestParam String userIdx, @RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee, @RequestParam(required = false) String packaging) throws BaseException {
         try {
-            List<GetRestListRes> getRestListRes;
-
-            if (categoryIdx != null) { // 카테고리 구분 시
-                if (rate != null) { // 별점 높은 순
-                    getRestListRes = restaurantProvider.getRestByRate(Integer.parseInt(categoryIdx));
-                } else if (isCheetah != null) { // 치타 배달
-                    getRestListRes = restaurantProvider.getRestByCheetah(Integer.parseInt(categoryIdx));
-                } else if (deliveryFee != null) { // 배달비
-                    getRestListRes = restaurantProvider.getRestByDeliveryFee(Integer.parseInt(categoryIdx), Integer.parseInt(deliveryFee));
-                } else if (minOrderFee != null) { // 최소 주문비
-                    getRestListRes = restaurantProvider.getRestByMinOrderFee(Integer.parseInt(categoryIdx), Integer.parseInt(minOrderFee));
-                } else { // default
-                    getRestListRes = restaurantProvider.getRest(Integer.parseInt(categoryIdx));
-                }
-            } else {
-                if (rate != null) { // 별점 높은 순
-                    getRestListRes = restaurantProvider.getRestByRate();
-                } else if (isCheetah != null) { // 치타 배달
-                    getRestListRes = restaurantProvider.getRestByCheetah();
-                } else if (deliveryFee != null) { // 배달비
-                    getRestListRes = restaurantProvider.getRestByDeliveryFee(Integer.parseInt(deliveryFee));
-                } else if (minOrderFee != null) { // 최소 주문비
-                    getRestListRes = restaurantProvider.getRestByMinOrderFee(Integer.parseInt(minOrderFee));
-                } else { // default
-                    getRestListRes = restaurantProvider.getRest();
-                }
+            // TODO: 형식적 validation - null 확인
+            if (userIdx == null) {
+                throw new BaseException(NO_USERIDX); // userIdx를 입력해주세요.
             }
+            int userIdx_int = Integer.parseInt(userIdx);
+
+            if (sortIdx == null) {
+                sortIdx = "1"; // sorting default : 추천순
+            }
+            int sortIdx_int = Integer.parseInt(sortIdx);
+
+            // filtering
+            String[] filtering = new String[]{categoryIdx, isCheetah, deliveryFee, minOrderFee, packaging};
+            List<GetRestListRes> getRestListRes = restaurantProvider.filterRestaurants(filtering, sortIdx_int, userIdx_int);
+
+            // sorting
+            switch (sortIdx_int) {
+//                case (1): // 추천순
+//                    getRestListRes = restaurantProvider.sortByRecommend(getRestListRes);
+//                    break;
+                case (2): // 주문 많은 순
+                    getRestListRes = restaurantProvider.sortByOrderNum(getRestListRes);
+                    break;
+                case (3): // 가까운 순
+                    restaurantProvider.sortByDistance(getRestListRes);
+                    break;
+            }
+
             return new BaseResponse<>(getRestListRes);
 
         } catch (BaseException exception) {
