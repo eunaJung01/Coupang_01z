@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.umc.coupang_01z.utils.JwtService;
 
 @Service
 public class RestaurantService {
@@ -12,12 +11,10 @@ public class RestaurantService {
 
     private final RestaurantDao restaurantDao;
     private final RestaurantProvider restaurantProvider;
-    private final JwtService jwtService;
 
     @Autowired
-    public RestaurantService(RestaurantDao restaurantDao, RestaurantProvider restaurantProvider, JwtService jwtService) {
+    public RestaurantService(RestaurantDao restaurantDao, RestaurantProvider restaurantProvider) {
         this.restaurantDao = restaurantDao;
         this.restaurantProvider = restaurantProvider;
-        this.jwtService = jwtService;
     }
 }

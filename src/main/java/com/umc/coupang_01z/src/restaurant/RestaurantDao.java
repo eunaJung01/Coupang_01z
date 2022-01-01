@@ -2,6 +2,7 @@ package com.umc.coupang_01z.src.restaurant;
 
 import com.umc.coupang_01z.src.restaurant.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -70,25 +71,23 @@ public class RestaurantDao {
         );
     }
 
-    // 리뷰 개수 반환
-    public int getRateNum(int restIdx) {
-        String query = "SELECT COUNT(restIdx) From Review WHERE restIdx = ?";
-        return this.jdbcTemplate.queryForObject(query, int.class, restIdx);
-    }
-
     // 사용자 위치정보(latitude, longitude) 반환
-    public Location getLocation(int userIdx) {
-        String query = "SELECT userIdx AS idx, latitude AS lat, longitude AS lng FROM Address WHERE userIdx = ? AND status = 'C'";
-        return this.jdbcTemplate.queryForObject(query,
-                (rs, rowNum) -> new Location(
-                        rs.getInt("idx"),
-                        rs.getDouble("lat"),
-                        rs.getDouble("lng")),
-                userIdx
-        );
+    public Location getLocation(int userIdx) throws EmptyResultDataAccessException {
+        try {
+            String query = "SELECT userIdx AS idx, latitude AS lat, longitude AS lng FROM Address WHERE userIdx = ? AND status = 'C'";
+            return this.jdbcTemplate.queryForObject(query,
+                    (rs, rowNum) -> new Location(
+                            rs.getInt("idx"),
+                            rs.getDouble("lat"),
+                            rs.getDouble("lng")),
+                    userIdx
+            );
+        } catch (EmptyResultDataAccessException exception) {
+            return null;
+        }
     }
 
-    // 음식점 위치정보(latitude, longitude) 반환
+    // 음식점 위치정보(restLatitude, restLongitude) 반환
     public Location getRestLocation(int restIdx) {
         String query = "SELECT restIdx AS idx, restLatitude AS lat, restLongitude AS lng FROM Restaurant WHERE restIdx = ?";
         return this.jdbcTemplate.queryForObject(query,
@@ -98,6 +97,24 @@ public class RestaurantDao {
                         rs.getDouble("lng")),
                 restIdx
         );
+    }
+
+    // 리뷰 개수 반환
+    public int getRateNum(int restIdx) {
+        String query = "SELECT COUNT(restIdx) From Review WHERE restIdx = ?";
+        return this.jdbcTemplate.queryForObject(query, int.class, restIdx);
+    }
+
+    // 치타 배달 유무 반환
+    public int getCheetah(int restIdx) {
+        String query = "SELECT isCheetah FROM Restaurant WHERE restIdx = ?";
+        return this.jdbcTemplate.queryForObject(query, int.class, restIdx);
+    }
+
+    // 포장 유무 반환
+    public int getPackaging(int restIdx) {
+        String query = "SELECT packaging FROM Restaurant WHERE restIdx = ?";
+        return this.jdbcTemplate.queryForObject(query, int.class, restIdx);
     }
 
     // 음식점별 주문 횟수 반환

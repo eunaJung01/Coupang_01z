@@ -5,8 +5,8 @@ import com.umc.coupang_01z.config.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import com.umc.coupang_01z.utils.JwtService;
 
 import java.util.*;
 
@@ -17,12 +17,10 @@ public class RestaurantProvider {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final RestaurantDao restaurantDao;
-    private final JwtService jwtService;
 
     @Autowired
-    public RestaurantProvider(RestaurantDao restaurantDao, JwtService jwtService) {
+    public RestaurantProvider(RestaurantDao restaurantDao) {
         this.restaurantDao = restaurantDao;
-        this.jwtService = jwtService;
     }
 
     // 카테고리 조회
@@ -36,7 +34,7 @@ public class RestaurantProvider {
     }
 
     // 음식점 리스트 조회
-    public List<GetRestListRes> filterRestaurants(String[] filtering, int sortIdx, int userIdx) throws BaseException {
+    public List<GetRestListRes> filterRestaurants(String[] filtering, int sortIdx, int userIdx) throws EmptyResultDataAccessException, BaseException {
         try {
             List<GetRestListRes> filteredRestaurants = restaurantDao.getRestByFiltering(filtering, sortIdx);
             if (filteredRestaurants.isEmpty()) {
@@ -45,7 +43,13 @@ public class RestaurantProvider {
 
             // set distance field
             List<Location> location = new ArrayList<>();
-            location.add(restaurantDao.getLocation(userIdx)); // location.get(0) : userIdx, latitude, longitude (사용자 위치정보 - status = 'C')
+            Location userLocation = restaurantDao.getLocation(userIdx); // location.get(0) : userIdx, latitude, longitude (사용자 위치정보 - status = 'C')
+            if (userLocation != null) { // Address.status = 'C'가 없을 경우 (주소 설정 X)
+                location.add(userLocation);
+            } else {
+                throw new EmptyResultDataAccessException(0);
+            }
+
             for (GetRestListRes restaurant : filteredRestaurants) {
                 location.add(restaurantDao.getRestLocation(restaurant.getRestIdx())); // restIdx, restLatitude, restLongitude (음식점 위치정보)
             }
@@ -60,6 +64,8 @@ public class RestaurantProvider {
 
         } catch (NullPointerException exception) {
             throw new BaseException(NO_RESULT); // 검색 결과 없음
+        } catch (EmptyResultDataAccessException exception) {
+            throw new BaseException(NO_ADDRESS_STATUS_C); // 주소를 설정해주세요.
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
         }
@@ -94,44 +100,179 @@ public class RestaurantProvider {
         return distance;
     }
 
-//    // 매장 정렬 : 추천순
-//    public List<GetRestListRes> sortByRecommend(List<GetRestListRes> getRestListRes) {
-//    }
+    // 매장 정렬 : 추천순
+    /*
+     * 주문 많은 순 순위 : a
+     * 가까운 순 순위 : b
+     * 별점 높은 순 순위 : c
+     * 배달비 적은 순 순위 : d
+     * 치타 배달 = 0일 때 n (매장 개수)
+     * 포장 = 0일 때 n (매장 개수)
+     * => a^2+b^2+c^2+d^2+n+n 오름차순 순위로 조회
+     */
+    public List<GetRestListRes> sortByRecommend(List<GetRestListRes> getRestListRes) throws BaseException {
+        try {
+            int restNum = getRestListRes.size();
+            int[][] rateArr = new int[restNum][8];
+            // rowIdx = restIdx-1
+            // columnIdx = [0] : restIdx, [1] : 주문 개수 순위, [2] : 거리 순위, [3] : 별점 순위, [4] : 배달비 순위, [5] : 치타 배달?, [6] : 포장 가능?, [7] : 총점
+
+            for (int i = 0; i < rateArr.length; i++) {
+                rateArr[i][0] = i + 1; // restIdx 저장 - rateArr[restIdx-1][0]
+            }
+
+            // 주문 많은 순 조회
+            List<Map.Entry<Integer, Integer>> orderNum_sorted = sortRestIdxList(getRestListRes); // restIdx - COUNT(Order.restIdx)
+            for (int i = 0; i < orderNum_sorted.size(); i++) {
+                rateArr[orderNum_sorted.get(i).getKey() - 1][1] = i + 1; // 순위 저장 - rateArr[restIdx-1][1]
+            }
+
+            // 가까운 순 조회
+            Collections.sort(getRestListRes); // distance 기준 오름차순 정렬
+            for (int i = 0; i < getRestListRes.size(); i++) {
+                rateArr[getRestListRes.get(i).getRestIdx() - 1][2] = i + 1; // 순위 저장 - rateArr[restIdx-1][2]
+            }
+
+            // 별점 높은 순 조회
+            class RateComparator implements Comparator<GetRestListRes> {
+                @Override
+                public int compare(GetRestListRes res1, GetRestListRes res2) { // rate 기준 내림차순 정렬
+                    if (res1.getRate() > res2.getRate()) {
+                        return -1;
+                    } else if (res1.getRate() < res2.getRate()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }
+            RateComparator rateComparator = new RateComparator();
+            getRestListRes.sort(rateComparator);
+            for (int i = 0; i < getRestListRes.size(); i++) {
+                rateArr[getRestListRes.get(i).getRestIdx() - 1][3] = i + 1; // 순위 저장 - rateArr[restIdx-1][3]
+            }
+
+            // 배달비 적은 순 조회
+            class DeliveryFeeComparator implements Comparator<GetRestListRes> {
+                @Override
+                public int compare(GetRestListRes res1, GetRestListRes res2) { // deliveryFee 기준 오름차순 정렬
+                    if (res1.getDeliveryFee() > res2.getDeliveryFee()) {
+                        return 1;
+                    } else if (res1.getDeliveryFee() < res2.getDeliveryFee()) {
+                        return -1;
+                    }
+                    return 0;
+                }
+            }
+            DeliveryFeeComparator deliveryFeeComparator = new DeliveryFeeComparator();
+            getRestListRes.sort(deliveryFeeComparator);
+            for (int i = 0; i < getRestListRes.size(); i++) {
+                rateArr[getRestListRes.get(i).getRestIdx() - 1][4] = i + 1; // 순위 저장 - rateArr[restIdx-1][4]
+            }
+
+            // 치타 배달 유무 확인
+            for (int i = 0; i < rateArr.length; i++) {
+                if (restaurantDao.getCheetah(i + 1) == 0) { // 치타 배달 X
+                    rateArr[i][5] = restNum;
+                }
+            }
+
+            // 포장 유무 확인
+            for (int i = 0; i < rateArr.length; i++) {
+                if (restaurantDao.getPackaging(i + 1) == 0) { // 포장 X
+                    rateArr[i][6] = restNum;
+                }
+            }
+
+            // 총점 계산
+            for (int i = 0; i < rateArr.length; i++) {
+                rateArr[i][7] = (int) (Math.pow(rateArr[i][1], 2) + Math.pow(rateArr[i][2], 2) + Math.pow(rateArr[i][3], 2) + Math.pow(rateArr[i][4], 2) + rateArr[i][5] + rateArr[i][6]);
+            }
+            Arrays.sort(rateArr, (o1, o2) -> { // rateArr[i][7] 기준 오름차순 정렬
+                if (o1[7] > o2[7]) {
+                    return 1;
+                } else if (o1[7] < o2[7]) {
+                    return -1;
+                }
+                return 0;
+            });
+
+            // sort getRestListRes
+            List<GetRestListRes> getRestListRes_sorted = new ArrayList<>();
+            for (int[] arr : rateArr) {
+                for (GetRestListRes getRestList : getRestListRes) {
+                    if (arr[0] == getRestList.getRestIdx()) {
+                        getRestListRes_sorted.add(getRestList);
+                    }
+                }
+            }
+
+//            for (int[] arr : rateArr) {
+//                for (int j = 0; j < rateArr[0].length; j++) {
+//                    System.out.print(arr[j] + " ");
+//                }
+//                System.out.println();
+//            }
+
+            return getRestListRes_sorted;
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
+    }
 
     // 매장 정렬 : 주문 많은 순
     public List<GetRestListRes> sortByOrderNum(List<GetRestListRes> getRestListRes) throws BaseException {
-        Set<Integer> findRestIdx = new HashSet<>(); // getRestListRes에 있는 restIdx 목록
-        for (GetRestListRes restaurants : getRestListRes) {
-            findRestIdx.add(restaurants.getRestIdx());
-        }
-        List<Integer> restIdxList = new ArrayList<>(findRestIdx); // Set -> List
+        try {
+            // get restIdxList and sort filteredRestaurants
+            List<Map.Entry<Integer, Integer>> filteredRestaurants_sorted = sortRestIdxList(getRestListRes);
 
-        Map<Integer, Integer> filteredRestaurants = new HashMap<>(); // restIdx - COUNT(Order.restIdx)
-        for (Integer restIdx : restIdxList) {
-            filteredRestaurants.put(restIdx, restaurantDao.countRestIdx(restIdx)); // 음식점별 주문 횟수
-        }
-
-        // sort filteredRestaurants
-        List<Map.Entry<Integer, Integer>> filteredRestaurants_sorted = new LinkedList<>(filteredRestaurants.entrySet());
-        filteredRestaurants_sorted.sort((o1, o2) -> (int) (o2.getValue()) - o1.getValue()); // 내림차순 정렬 (COUNT(Order.restIdx) 기준)
-
-        // sort getRestListRes
-        List<GetRestListRes> getRestListRes_sorted = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> sortOrder : filteredRestaurants_sorted) {
-            for (GetRestListRes getRestList : getRestListRes) {
-                if (sortOrder.getKey() == getRestList.getRestIdx()) {
-                    getRestListRes_sorted.add(getRestList);
+            // sort getRestListRes
+            List<GetRestListRes> getRestListRes_sorted = new ArrayList<>();
+            for (Map.Entry<Integer, Integer> sortOrder : filteredRestaurants_sorted) {
+                for (GetRestListRes getRestList : getRestListRes) {
+                    if (sortOrder.getKey() == getRestList.getRestIdx()) {
+                        getRestListRes_sorted.add(getRestList);
+                    }
                 }
             }
-        }
+            return getRestListRes_sorted;
 
-        return getRestListRes_sorted;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
+    }
+
+    // 음식점 목록 가져온 후 주문 많은 순으로 내림차순 정렬
+    public List<Map.Entry<Integer, Integer>> sortRestIdxList(List<GetRestListRes> getRestListRes) throws
+            BaseException {
+        try {
+            // get restIdxList
+            Set<Integer> findRestIdx = new HashSet<>(); // getRestListRes에 있는 restIdx 목록
+            for (GetRestListRes restaurants : getRestListRes) {
+                findRestIdx.add(restaurants.getRestIdx());
+            }
+            List<Integer> restIdxList = new ArrayList<>(findRestIdx); // Set -> List
+
+            Map<Integer, Integer> filteredRestaurants = new HashMap<>(); // restIdx - COUNT(Order.restIdx)
+            for (Integer restIdx : restIdxList) {
+                filteredRestaurants.put(restIdx, restaurantDao.countRestIdx(restIdx)); // 음식점별 주문 횟수
+            }
+
+            // sort filteredRestaurants
+            List<Map.Entry<Integer, Integer>> filteredRestaurants_sorted = new LinkedList<>(filteredRestaurants.entrySet());
+            filteredRestaurants_sorted.sort((o1, o2) -> (int) (o2.getValue()) - o1.getValue()); // 내림차순 정렬 (COUNT(Order.restIdx) 기준)
+
+            return filteredRestaurants_sorted;
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.
+        }
     }
 
     // 매장 정렬 : 가까운 순
     public void sortByDistance(List<GetRestListRes> getRestListRes) throws BaseException {
         try {
-            Collections.sort(getRestListRes); // distance 기준 내림차순 정렬
+            Collections.sort(getRestListRes); // distance 기준 오름차순 정렬
 
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR); // 데이터베이스 연결에 실패하였습니다.

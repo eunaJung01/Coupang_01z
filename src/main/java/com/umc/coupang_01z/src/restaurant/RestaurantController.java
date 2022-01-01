@@ -4,7 +4,6 @@ import com.umc.coupang_01z.src.restaurant.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.umc.coupang_01z.config.*;
-import com.umc.coupang_01z.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +20,10 @@ public class RestaurantController {
     private final RestaurantProvider restaurantProvider;
     @Autowired
     private final RestaurantService restaurantService;
-    @Autowired
-    private final JwtService jwtService; // JWT 사용 시
 
-    public RestaurantController(RestaurantProvider restaurantProvider, RestaurantService restaurantService, JwtService jwtService) {
+    public RestaurantController(RestaurantProvider restaurantProvider, RestaurantService restaurantService) {
         this.restaurantProvider = restaurantProvider;
         this.restaurantService = restaurantService;
-        this.jwtService = jwtService;
     }
 
     /*
@@ -62,7 +58,7 @@ public class RestaurantController {
      */
     @ResponseBody
     @GetMapping("/restaurant")
-    public BaseResponse<List<GetRestListRes>> getRestaurants(@RequestParam(required = false) String sortIdx, @RequestParam String userIdx, @RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee, @RequestParam(required = false) String packaging) throws BaseException {
+    public BaseResponse<List<GetRestListRes>> getRestaurants(@RequestParam(required = false) String sortIdx, @RequestParam(required = false) String userIdx, @RequestParam(required = false) String categoryIdx, @RequestParam(required = false) String isCheetah, @RequestParam(required = false) String deliveryFee, @RequestParam(required = false) String minOrderFee, @RequestParam(required = false) String packaging) throws BaseException {
         try {
             // TODO: 형식적 validation - null 확인
             if (userIdx == null) {
@@ -81,9 +77,9 @@ public class RestaurantController {
 
             // sorting
             switch (sortIdx_int) {
-//                case (1): // 추천순
-//                    getRestListRes = restaurantProvider.sortByRecommend(getRestListRes);
-//                    break;
+                case (1): // 추천순
+                    getRestListRes = restaurantProvider.sortByRecommend(getRestListRes);
+                    break;
                 case (2): // 주문 많은 순
                     getRestListRes = restaurantProvider.sortByOrderNum(getRestListRes);
                     break;

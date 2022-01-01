@@ -62,7 +62,8 @@ public enum BaseResponseStatus {
     // 6000 : 필요시 만들어서 쓰세요 - 레마
     NO_RESULT(false, 6000, "검색 결과 없음"),
     NO_OPTION(false, 6001, "해당 메뉴에 옵션 없음"),
-    NO_USERIDX(false, 6002, "userIdx를 입력해주세요.");
+    NO_USERIDX(false, 6002, "userIdx를 입력해주세요."),
+    NO_ADDRESS_STATUS_C(false, 6002, "주소를 설정해주세요.");
 
 
     private final boolean isSuccess;
